@@ -3,10 +3,10 @@ import { Collapse, Container, Navbar, NavbarBrand, NavbarToggler, NavItem, NavLi
 import { Link } from 'react-router-dom';
 import './NavMenu.css';
 
-export class NavMenu extends Component {
+export class NavMenu extends Component<{}, { collapsed: boolean }> {
   static displayName = NavMenu.name;
 
-  constructor (props) {
+  constructor (props:any) {
     super(props);
 
     this.toggleNavbar = this.toggleNavbar.bind(this);
@@ -25,7 +25,7 @@ export class NavMenu extends Component {
     return (
       <header>
         <Navbar className="navbar-expand-sm navbar-toggleable-sm ng-white border-bottom box-shadow mb-3" light>
-          <Container>
+          <Container fluid>
             <NavbarBrand tag={Link} to="/">SerjTm.Sample.CsvEditor.Wui</NavbarBrand>
             <NavbarToggler onClick={this.toggleNavbar} className="mr-2" />
             <Collapse className="d-sm-inline-flex flex-sm-row-reverse" isOpen={!this.state.collapsed} navbar>
