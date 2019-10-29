@@ -63,6 +63,8 @@ namespace SerjTm.Sample.CsvEditor.Wui
                     spa.UseReactDevelopmentServer(npmScript: "start");
                 }
             });
+
+            System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
         }
     }
 }
