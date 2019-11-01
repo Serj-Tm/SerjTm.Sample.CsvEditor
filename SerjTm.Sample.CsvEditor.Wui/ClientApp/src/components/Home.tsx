@@ -2,7 +2,9 @@
 import axios from 'axios';
 import { Table, Row, Col, Button, ButtonGroup, Input } from 'reactstrap';
 import { oc } from 'ts-optchain';
-import * as api from './../api/csv';
+import * as api from '../api/csv';
+import { HeaderWidget } from '../controls/header';
+import { CsvSetting, CsvSettingWidget } from '../controls/CsvSetting';
 
 export class Home extends Component<{}, HomeState> {
   static displayName = Home.name;
@@ -16,7 +18,10 @@ export class Home extends Component<{}, HomeState> {
   }
 
   async load() {
-    const { headers, rows } = await api.process('-', { separator: '\t', isHeader: true });
+    if (this.state.csvSetting == null)
+      return;
+
+    const { headers, rows } = await api.process(this.state.csvSetting.filename, { separator: this.state.csvSetting.separator, isHeader: this.state.csvSetting.isHeader });
     this.setState({ headers, rows });
   }
 
@@ -26,12 +31,24 @@ export class Home extends Component<{}, HomeState> {
     await this.load();
   }
 
+  setSetting = async (csvSetting: CsvSetting) => {
+    await this.setStateAsync({ csvSetting });
+
+    await this.load();
+  }
+
+  setStateAsync<K extends keyof HomeState>(state: Pick<HomeState, K>) {
+    return new Promise((resolve) => {
+      this.setState(state, resolve)
+    });
+  }
 
 
   render () {
     return (
       <Row>
         <Col sm='4'>
+          <CsvSettingWidget apply={this.setSetting}/>
         </Col>
         <Col sm='8'>
           {
@@ -54,87 +71,6 @@ export class Home extends Component<{}, HomeState> {
   }
 }
 
-class HeaderWidget extends Component<{ headers: string[], apply:(headers:string[])=>void}, { isEdit: boolean }> {
-  static displayName = HeaderWidget.name;
-
-  constructor(props: { headers: string[], apply: (headers: string[]) => void }) {
-    super(props);
-
-    this.state = { isEdit: false };
-
-  }
-  toggleEdit = () => {
-    this.setState({ isEdit: !this.state.isEdit });
-  }
-
-  render() {
-    return (
-      <div>
-        <ButtonGroup><h3>Колонки</h3><span></span><Button style={{ marginLeft: '10px' }} onClick={() => this.toggleEdit()}>Редактировать</Button></ButtonGroup>
-        {this.state.isEdit ? <HeaderEditor headers={this.props.headers} cancel={this.toggleEdit} apply={(headers) => { this.props.apply(headers); this.toggleEdit(); }} /> : <HeaderView headers={this.props.headers} />}
-      </div>);
-  }
-}
-
-
-function HeaderView(props: { headers: string[] }) {
-  const { headers } = props;
-
-  return (
-      <Table>
-        <tbody>
-          {
-            headers.map((header, k) =>
-              <tr key={k}><td>{header}</td></tr>
-            )
-          }
-        </tbody>
-      </Table>
-    );
-}
-
-
-class HeaderEditor extends Component<HeaderEditorProps, {headers:string[]}> {
-  static displayName = HeaderEditor.name;
-
-  constructor(props: HeaderEditorProps) {
-    super(props);
-
-    const { headers } = props;
-
-    this.state = {headers};
-
-  }
-  handle = (i: number, v: string) => {
-    const headers = [...this.state.headers];
-    headers[i] = v;
-    this.setState({ headers: headers });
-  }
-
-  render() {
-    return (
-      <div>
-        <Table>
-          <tbody>
-            {
-              this.state.headers.map((header, i) =>
-                <tr key={i}><td><Input value={header} onChange={e => this.handle(i, e.target.value)} /></td></tr>
-              )
-            }
-          </tbody>
-        </Table>
-        <Button onClick={() => this.props.apply(this.state.headers)}>Применить</Button>{' '}
-        <Button onClick={() => this.props.cancel()}>Отмена</Button>
-      </div>
-    );
-  }
-}
-
-interface HeaderEditorProps {
-  headers: string[];
-  cancel: () => void;
-  apply: (headers: string[]) => void;
-}
 
 
 function DataTable(props: { headers: string[], rows: string[][] }) {
@@ -170,6 +106,7 @@ function DataTable(props: { headers: string[], rows: string[][] }) {
 
 
 interface HomeState {
+  csvSetting?: CsvSetting;
   headers?: string[];
   rows?: string[][];
 }

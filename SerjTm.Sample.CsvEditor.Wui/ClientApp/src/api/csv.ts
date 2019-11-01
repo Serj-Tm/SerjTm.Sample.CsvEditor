@@ -1,7 +1,7 @@
 ﻿import axios from 'axios';
 
 export async function process(filename: string, params: ProcessParams) {
-  const response = await axios.get(`api/csv/${filename}`, { params });
+  const response = await axios.post(`api/csv/${filename}`, params);
   return response.data as ProcessResponse;
 }
 

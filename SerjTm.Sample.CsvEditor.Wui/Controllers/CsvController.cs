@@ -20,26 +20,27 @@ namespace SerjTm.Sample.CsvEditor.Wui.Controllers
         private IHostingEnvironment Environment;
 
 
-        [HttpGet("api/csv/{filename}")]
-        public object Csv(string filename)
+        [HttpPost("api/csv/{filename}")]
+        public object Csv_Parse(string filename, [FromBody] Csv_Parse_Request request)
         {
             //HACK
             filename = "q.txt";
 
-            const string separator = "\t";
+            //const string separator = "\t";
 
             var fullFilename = Path.Combine(Environment.WebRootPath ?? Directory.GetCurrentDirectory(), "Data", filename);
 
             var lines = System.IO.File.ReadAllLines(fullFilename, Encoding.GetEncoding(1251));
 
-            var headers = (lines[0]?.Split(separator)).OrEmpty();
+            var headers = (lines[0]?.Split(request.Separator)).OrEmpty();
 
-            var rows = lines.Skip(1).Select(line => line.Split(separator));
+            var rows = lines.Skip(1).Select(line => line.Split(request.Separator));
 
             return new
             {
                 headers, 
-                rows
+                rows,
+                separator = request.Separator
             };
         }
         [HttpPut("api/csv/{filename}/headers")]
@@ -66,5 +67,10 @@ namespace SerjTm.Sample.CsvEditor.Wui.Controllers
     public class Csv_SetHeaders_Request
     {
         public string[] Headers;
+    }
+    public class Csv_Parse_Request
+    {
+        public string Separator;
+        public bool IsHeader; 
     }
 }
