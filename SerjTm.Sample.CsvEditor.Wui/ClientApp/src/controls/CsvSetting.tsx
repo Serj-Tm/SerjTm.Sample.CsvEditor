@@ -41,15 +41,27 @@ export class CsvSettingWidget extends Component<CsvSettingProps, CsvSettingState
   }
 
   handleTab = (e: React.KeyboardEvent<HTMLInputElement>) => {
+
+    const SHIFT = 16;
+    const CTRL = 17;
+    const ALT = 18;
+    const BACKSPACE = 8;
+
+    if (e.charCode != SHIFT && e.charCode != CTRL && e.charCode != ALT && e.charCode != BACKSPACE) {
+      var ch = String.fromCharCode(e.charCode);
+      this.setState({ newSetting: { ...this.state.newSetting, separator: ch } })
+    }
+
     const TABKEY = 9;
     if (e.keyCode == TABKEY) {
       //(e.target as any).value += '\t';
-      this.setState({ newSetting: { ...this.state.newSetting, separator: oc(this.state.newSetting.separator)('') + '\t' } })
+      //this.setState({ newSetting: { ...this.state.newSetting, separator: oc(this.state.newSetting.separator)('') + '\t' } })
       if (e.preventDefault) {
         e.preventDefault();
       }
-      return true;
+      //return true;
     }
+    return false;
   }
 
   render() {
