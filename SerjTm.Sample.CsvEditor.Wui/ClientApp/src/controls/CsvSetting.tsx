@@ -1,5 +1,5 @@
 ﻿import React, { Component } from 'react';
-import { Container, Card, CardHeader, CardBody, Form, FormGroup, Input, InputGroup, InputGroupAddon, Button, InputGroupText, Spinner, Label, FormFeedback, InputGroupButtonDropdown, DropdownToggle, DropdownMenu } from 'reactstrap'
+import { Container, Card, CardHeader, CardBody, Form, FormGroup, Input, InputGroup, InputGroupAddon, Button, InputGroupText, Spinner, Label, FormFeedback, InputGroupButtonDropdown, DropdownToggle, DropdownMenu, ListGroup, ListGroupItem } from 'reactstrap'
 import { oc } from 'ts-optchain';
 
 
@@ -46,13 +46,14 @@ export class CsvSettingWidget extends Component<CsvSettingProps, CsvSettingState
     const CTRL = 17;
     const ALT = 18;
     const BACKSPACE = 8;
+    const TABKEY = 9;
 
     if (e.charCode != SHIFT && e.charCode != CTRL && e.charCode != ALT && e.charCode != BACKSPACE) {
-      var ch = String.fromCharCode(e.charCode);
-      this.setState({ newSetting: { ...this.state.newSetting, separator: ch } })
+      var ch = e.charCode == TABKEY ? '\t': String.fromCharCode(e.charCode);
+      this.setState({ newSetting: { ...this.state.newSetting, separator: '\t' } })
+      console.log({ newSetting: { ...this.state.newSetting, separator: '\t' } });
     }
 
-    const TABKEY = 9;
     if (e.keyCode == TABKEY) {
       //(e.target as any).value += '\t';
       //this.setState({ newSetting: { ...this.state.newSetting, separator: oc(this.state.newSetting.separator)('') + '\t' } })
@@ -65,6 +66,7 @@ export class CsvSettingWidget extends Component<CsvSettingProps, CsvSettingState
   }
 
   render() {
+    const files = ['q.txt', 'q2.txt'];
     return (
       <Form>
         <FormGroup>
@@ -72,9 +74,14 @@ export class CsvSettingWidget extends Component<CsvSettingProps, CsvSettingState
           <InputGroup>
             <Input id='settingFilename' readOnly style={{ backgroundColor: '#fff' }} value={toEmpty(this.state.newSetting.filename)} placeholder='выберите файл' />
             <InputGroupButtonDropdown addonType="append" isOpen={this.state.isDropDownOpened} toggle={this.toggleDropDown}>
-              <DropdownToggle caret/>
-              <DropdownMenu style={{ maxHeight: '500px', overflowY: 'auto', maxWidth: '600px', overflowX: 'auto' }}>
-                <div>bla-bla</div>
+              <DropdownToggle caret></DropdownToggle>
+              <DropdownMenu right={true} style={{ maxHeight: '500px', overflowY: 'auto', minWidth: '200px', maxWidth: '600px', overflowX: 'auto' }}>
+                <ListGroup>
+                {
+
+                    files.map((file, k) => <ListGroupItem key={k} tag='a' href='#' action active={file == this.state.newSetting.filename} onClick={(e) => { this.setState({ newSetting: { ...this.state.newSetting, filename: file } }); this.toggleDropDown(); e.preventDefault(); }}> {file}</ListGroupItem>)
+                }
+                </ListGroup>
               </DropdownMenu>
             </InputGroupButtonDropdown>
           </InputGroup>
@@ -82,7 +89,7 @@ export class CsvSettingWidget extends Component<CsvSettingProps, CsvSettingState
         <FormGroup>
           <Label for="settingSeparator">Разделитель</Label>
           <Input name="separator" id="settingSeparator" placeholder="укажите разделитель" value={toEmpty(this.state.newSetting.separator)}
-            onChange={this.handleChange}
+            onChange={() => { }}
             onKeyDown={this.handleTab} />
         </FormGroup>
 
