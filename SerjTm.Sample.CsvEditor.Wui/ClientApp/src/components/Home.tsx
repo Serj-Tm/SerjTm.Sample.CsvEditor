@@ -1,6 +1,6 @@
 ﻿import React, { Component } from 'react';
 import axios from 'axios';
-import { Table, Row, Col, Button, ButtonGroup, Input } from 'reactstrap';
+import { Table, Row, Col, Button, ButtonGroup, Input, Spinner } from 'reactstrap';
 import { oc } from 'ts-optchain';
 import * as api from '../api/csv';
 import { HeaderWidget } from '../controls/header';
@@ -14,14 +14,19 @@ export class Home extends Component<{}, HomeState> {
 
     this.state = {};
 
-    this.load();
+    this.loadFiles();
+  }
+
+  async loadFiles() {
+    const files = await api.files();
+    this.setState({files: files});
   }
 
   async load() {
     if (this.state.csvSetting == null)
       return;
 
-    const { headers, rows } = await api.process(this.state.csvSetting.filename, { separator: this.state.csvSetting.separator, isHeader: this.state.csvSetting.isHeader });
+    const { headers, rows } = await api.parse(this.state.csvSetting.filename, { separator: this.state.csvSetting.separator, isHeader: this.state.csvSetting.isHeader });
     this.setState({ headers, rows });
   }
 
@@ -48,7 +53,7 @@ export class Home extends Component<{}, HomeState> {
     return (
       <Row>
         <Col sm='4'>
-          <CsvSettingWidget apply={this.setSetting}/>
+          {this.state.files != null ? <CsvSettingWidget files={this.state.files} apply={this.setSetting} /> : <Spinner />}
         </Col>
         <Col sm='8'>
           {
@@ -106,6 +111,7 @@ function DataTable(props: { headers: string[], rows: string[][] }) {
 
 
 interface HomeState {
+  files?: string[];
   csvSetting?: CsvSetting;
   headers?: string[];
   rows?: string[][];

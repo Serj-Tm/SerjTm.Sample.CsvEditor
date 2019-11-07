@@ -1,16 +1,21 @@
 ﻿import axios from 'axios';
 
-export async function process(filename: string, params: ProcessParams) {
-  const response = await axios.post(`api/csv/${filename}`, params);
-  return response.data as ProcessResponse;
+export async function files() {
+  const response = await axios.get(`api/csv-s`);
+  return response.data as string[];
 }
 
-interface ProcessParams {
+export async function parse(filename: string, params: ParseParams) {
+  const response = await axios.post(`api/csv/${filename}`, params);
+  return response.data as ParseResponse;
+}
+
+interface ParseParams {
   separator: string;
   isHeader: boolean;
 }
 
-interface ProcessResponse {
+interface ParseResponse {
   headers: string[];
   rows: string[][];
 }

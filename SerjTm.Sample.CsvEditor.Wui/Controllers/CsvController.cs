@@ -19,14 +19,17 @@ namespace SerjTm.Sample.CsvEditor.Wui.Controllers
         }
         private IHostingEnvironment Environment;
 
+        [HttpGet("api/csv-s")]
+        public ActionResult<string[]> Files()
+        {
+            var path = Path.Combine(Environment.WebRootPath ?? Directory.GetCurrentDirectory(), "Data");
+            return Directory.GetFiles(path).Select(fullFilename => Path.GetFileName(fullFilename)).ToArray();
+        }
+
 
         [HttpPost("api/csv/{filename}")]
         public object Csv_Parse(string filename, [FromBody] Csv_Parse_Request request)
         {
-            //HACK
-            filename = "q.txt";
-
-            //const string separator = "\t";
 
             var fullFilename = Path.Combine(Environment.WebRootPath ?? Directory.GetCurrentDirectory(), "Data", filename);
 
@@ -46,16 +49,11 @@ namespace SerjTm.Sample.CsvEditor.Wui.Controllers
         [HttpPut("api/csv/{filename}/headers")]
         public object Csv_SetHeaders(string filename, [FromBody]Csv_SetHeaders_Request request)
         {
-            //HACK
-            filename = "q.txt";
-
-            const string separator = "\t";
-
             var fullFilename = Path.Combine(Environment.WebRootPath ?? Directory.GetCurrentDirectory(), "Data", filename);
 
             var lines = System.IO.File.ReadAllLines(fullFilename, Encoding.GetEncoding(1251));
 
-            var newLines = new[] { request.Headers.JoinToString(separator) }.Concat(lines.Skip(1)).ToArray();
+            var newLines = new[] { request.Headers.JoinToString(request.Separator) }.Concat(lines.Skip(1)).ToArray();
 
             System.IO.File.WriteAllLines(fullFilename, newLines, Encoding.GetEncoding(1251));
 
@@ -66,6 +64,9 @@ namespace SerjTm.Sample.CsvEditor.Wui.Controllers
 
     public class Csv_SetHeaders_Request
     {
+        public string Separator;
+        public bool IsHeader;
+
         public string[] Headers;
     }
     public class Csv_Parse_Request

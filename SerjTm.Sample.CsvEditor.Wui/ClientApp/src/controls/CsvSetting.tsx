@@ -41,33 +41,8 @@ export class CsvSettingWidget extends Component<CsvSettingProps, CsvSettingState
     });
   }
 
-  handleTab = (e: React.KeyboardEvent<HTMLInputElement>) => {
-
-    const SHIFT = 16;
-    const CTRL = 17;
-    const ALT = 18;
-    const BACKSPACE = 8;
-    const TABKEY = 9;
-
-    if (e.charCode != SHIFT && e.charCode != CTRL && e.charCode != ALT && e.charCode != BACKSPACE) {
-      var ch = e.charCode == TABKEY ? '\t': String.fromCharCode(e.charCode);
-      this.setState({ newSetting: { ...this.state.newSetting, separator: '\t' } })
-      console.log({ newSetting: { ...this.state.newSetting, separator: '\t' } });
-    }
-
-    if (e.keyCode == TABKEY) {
-      //(e.target as any).value += '\t';
-      //this.setState({ newSetting: { ...this.state.newSetting, separator: oc(this.state.newSetting.separator)('') + '\t' } })
-      if (e.preventDefault) {
-        e.preventDefault();
-      }
-      //return true;
-    }
-    return false;
-  }
 
   render() {
-    const files = ['q.txt', 'q2.txt'];
     const separators = [
       { separator: '\t', title: 'tab' }, 
       { separator: ' ', title: 'пробел' }, 
@@ -87,7 +62,7 @@ export class CsvSettingWidget extends Component<CsvSettingProps, CsvSettingState
                 <ListGroup>
                 {
 
-                    files.map((file, k) => <ListGroupItem key={k} tag='a' href='#' action active={file == this.state.newSetting.filename} onClick={(e) => { this.setState({ newSetting: { ...this.state.newSetting, filename: file } }); this.toggleDropDown(); e.preventDefault(); }}> {file}</ListGroupItem>)
+                    this.props.files.map((file, k) => <ListGroupItem key={k} tag='a' href='#' action active={file == this.state.newSetting.filename} onClick={(e) => { this.setState({ newSetting: { ...this.state.newSetting, filename: file } }); this.toggleDropDown(); e.preventDefault(); }}> {file}</ListGroupItem>)
                 }
                 </ListGroup>
               </DropdownMenu>
@@ -139,6 +114,7 @@ interface CsvSettingState {
 }
 
 interface CsvSettingProps {
+  files: string[];
   apply: (setting: CsvSetting) => void;
 }
 
