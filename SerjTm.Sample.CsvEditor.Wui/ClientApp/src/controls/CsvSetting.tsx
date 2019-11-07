@@ -1,5 +1,5 @@
 ﻿import React, { Component } from 'react';
-import { Container, Card, CardHeader, CardBody, Form, FormGroup, Input, InputGroup, InputGroupAddon, Button, InputGroupText, Spinner, Label, FormFeedback, InputGroupButtonDropdown, DropdownToggle, DropdownMenu, ListGroup, ListGroupItem } from 'reactstrap'
+import { Container, Card, CardHeader, CardBody, Form, FormGroup, Input, InputGroup, InputGroupAddon, Button, InputGroupText, Spinner, Label, FormFeedback, InputGroupButtonDropdown, DropdownToggle, DropdownMenu, ListGroup, ListGroupItem, DropdownItem, FormText } from 'reactstrap'
 import { oc } from 'ts-optchain';
 
 
@@ -12,7 +12,8 @@ export class CsvSettingWidget extends Component<CsvSettingProps, CsvSettingState
 
     this.state = {
       isDropDownOpened: false,
-      newSetting: { filename: 'q', isHeader:true },
+      isSeparatorButtonOpened: false,
+      newSetting: { isHeader:true },
     };
 
   }
@@ -67,6 +68,13 @@ export class CsvSettingWidget extends Component<CsvSettingProps, CsvSettingState
 
   render() {
     const files = ['q.txt', 'q2.txt'];
+    const separators = [
+      { separator: '\t', title: 'tab' }, 
+      { separator: ' ', title: 'пробел' }, 
+      { separator: ',', title: ',' }, 
+      { separator: ';', title: ';' }, 
+    ];
+
     return (
       <Form>
         <FormGroup>
@@ -88,9 +96,23 @@ export class CsvSettingWidget extends Component<CsvSettingProps, CsvSettingState
         </FormGroup>
         <FormGroup>
           <Label for="settingSeparator">Разделитель</Label>
-          <Input name="separator" id="settingSeparator" placeholder="укажите разделитель" value={toEmpty(this.state.newSetting.separator)}
-            onChange={() => { }}
-            onKeyDown={this.handleTab} />
+          <InputGroup>
+            <Input name="separator" id="settingSeparator" placeholder="укажите разделитель" value={toEmpty(this.state.newSetting.separator)}
+              onChange={this.handleChange}
+            />
+            <InputGroupButtonDropdown addonType="append" isOpen={this.state.isSeparatorButtonOpened} toggle={() => this.setState({ isSeparatorButtonOpened: !this.state.isSeparatorButtonOpened })}>
+              <DropdownToggle caret>
+              </DropdownToggle>
+              <DropdownMenu>
+                {
+                  separators.map((separator, k) => <DropdownItem disabled={separator.separator == this.state.newSetting.separator} onClick={() => this.setState({ newSetting: { ...this.state.newSetting, separator: separator.separator } })}>{separator.title}</DropdownItem>)
+                }
+              </DropdownMenu>
+            </InputGroupButtonDropdown>
+          </InputGroup>
+          <FormText color="muted">
+            {separators.map(separator => separator.separator != separator.title && separator.separator == this.state.newSetting.separator ? `(${separator.title})` : undefined )}
+          </FormText>
         </FormGroup>
 
         <FormGroup check>
@@ -113,6 +135,7 @@ export class CsvSettingWidget extends Component<CsvSettingProps, CsvSettingState
 interface CsvSettingState {
   newSetting: { filename?: string, separator?: string, isHeader: boolean, };
   isDropDownOpened: boolean;
+  isSeparatorButtonOpened: boolean;
 }
 
 interface CsvSettingProps {
