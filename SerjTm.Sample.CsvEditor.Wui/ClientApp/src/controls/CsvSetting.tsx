@@ -80,7 +80,7 @@ export class CsvSettingWidget extends Component<CsvSettingProps, CsvSettingState
               </DropdownToggle>
               <DropdownMenu>
                 {
-                  separators.map((separator, k) => <DropdownItem disabled={separator.separator == this.state.newSetting.separator} onClick={() => this.setState({ newSetting: { ...this.state.newSetting, separator: separator.separator } })}>{separator.title}</DropdownItem>)
+                  separators.map((separator, k) => <DropdownItem key={k} disabled={separator.separator == this.state.newSetting.separator} onClick={() => this.setState({ newSetting: { ...this.state.newSetting, separator: separator.separator } })}>{separator.title}</DropdownItem>)
                 }
               </DropdownMenu>
             </InputGroupButtonDropdown>
